@@ -39,4 +39,9 @@ public class UserRepositoryImpl implements UserRepository {
         return users.values().stream()
                 .anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
     }
+
+    @Override
+    public boolean existsById(Long id) {
+        return users.containsKey(id);
+    }
 }
