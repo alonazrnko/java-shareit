@@ -5,7 +5,7 @@ import ru.practicum.user.model.User;
 import java.util.List;
 import java.util.Optional;
 
-interface UserRepository {
+public interface UserRepository {
     List<User> findAll();
 
     Optional<User> findById(Long id);
