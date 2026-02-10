@@ -1,4 +1,4 @@
-package ru.practicum.user.model;
+package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

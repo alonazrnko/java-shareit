@@ -1,6 +1,6 @@
-package ru.practicum.user;
+package ru.practicum.shareit.user;
 
-import ru.practicum.user.model.User;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.Optional;

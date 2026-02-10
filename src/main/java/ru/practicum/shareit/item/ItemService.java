@@ -1,6 +1,6 @@
-package ru.practicum.item;
+package ru.practicum.shareit.item;
 
-import ru.practicum.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import java.util.List;
 
 public interface ItemService {

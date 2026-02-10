@@ -1,7 +1,7 @@
-package ru.practicum.request.model;
+package ru.practicum.shareit.request.model;
 
 import lombok.Data;
-import ru.practicum.user.model.User;
+import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 
 @Data

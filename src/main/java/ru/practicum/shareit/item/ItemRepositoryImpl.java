@@ -1,8 +1,8 @@
-package ru.practicum.item;
+package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.item.model.Item;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
