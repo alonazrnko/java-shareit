@@ -23,11 +23,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> {
+                    log.error("Failed to add item: User with id {} not found", userId);
+                    return new NotFoundException("User not found with id: " + userId);
+                });
 
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
-        log.info("Adding new item for user {}: {}", userId, item.getName());
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -56,14 +58,29 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItem(Long itemId) {
+    public ItemDto getItem(Long userId, Long itemId) {
+        if (!userRepository.existsById(userId)) {
+            log.error("Failed to get item: User with id {} not found", userId);
+            throw new NotFoundException("User not found with id: " + userId);
+        }
+
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item not found with id: " + itemId));
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", itemId);
+                    return new NotFoundException("Item not found with id: " + itemId);
+                });
+
+        log.info("Item id: {} successfully retrieved for user id: {}", itemId, userId);
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public List<ItemDto> getUserItems(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            log.error("Failed to retrieve items: User with id {} not found", userId);
+            throw new NotFoundException("User not found with id: " + userId);
+        }
+
         return itemRepository.findByOwnerId(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
