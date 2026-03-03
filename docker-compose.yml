@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16.1
+    container_name: shareit-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=hp
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hp -d shareit"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
