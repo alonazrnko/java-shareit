@@ -40,6 +40,7 @@ public class ItemMapper {
     public CommentDto toCommentDto(Comment comment) {
         return new CommentDto(
                 comment.getId(),
+                comment.getItem().getId(),
                 comment.getText(),
                 comment.getAuthor().getName(),
                 comment.getCreated()

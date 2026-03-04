@@ -21,6 +21,7 @@ import ru.practicum.shareit.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,13 +73,14 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found"));
 
         ItemDto dto = itemMapper.toItemDto(item);
+        LocalDateTime now = LocalDateTime.now();
 
         dto.setComments(commentRepository.findAllByItemId(itemId).stream()
                 .map(itemMapper::toCommentDto)
                 .collect(Collectors.toList()));
 
         if (item.getOwner().getId().equals(userId)) {
-            return enrichWithBookings(dto);
+            enrichItemDto(dto, now);
         }
 
         return dto;
@@ -86,12 +88,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByOwner(Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
-        return itemRepository.findByOwnerId(userId).stream()
+        List<Item> items = itemRepository.findByOwnerId(userId);
+        List<Long> itemIds = items.stream().map(Item::getId).toList();
+        LocalDateTime now = LocalDateTime.now();
+
+        Map<Long, List<CommentDto>> commentsMap = commentRepository.findAllByItemIdIn(itemIds).stream()
+                .map(itemMapper::toCommentDto)
+                .collect(Collectors.groupingBy(CommentDto::getItemId));
+
+        return items.stream()
                 .map(itemMapper::toItemDto)
-                .map(this::setBookings)
+                .map(dto -> {
+                    dto.setComments(commentsMap.getOrDefault(dto.getId(), new ArrayList<>()));
+                    return enrichItemDto(dto, now);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -103,26 +115,6 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.search(text).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
-    }
-
-    private ItemDto setBookings(ItemDto dto) {
-        LocalDateTime now = LocalDateTime.now();
-
-        Booking last = bookingRepository
-                .findFirstByItemIdAndStartBeforeAndStatusNotOrderByStartDesc(
-                        dto.getId(), now, BookingStatus.REJECTED);
-
-        Booking next = bookingRepository
-                .findFirstByItemIdAndStartAfterAndStatusNotOrderByStartAsc(
-                        dto.getId(), now, BookingStatus.REJECTED);
-
-        if (last != null) {
-            dto.setLastBooking(new ItemDto.BookingShortDto(last.getId(), last.getBooker().getId()));
-        }
-        if (next != null) {
-            dto.setNextBooking(new ItemDto.BookingShortDto(next.getId(), next.getBooker().getId()));
-        }
-        return dto;
     }
 
     @Override
@@ -151,9 +143,7 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toCommentDto(commentRepository.save(comment));
     }
 
-    private ItemDto enrichWithBookings(ItemDto dto) {
-        LocalDateTime now = LocalDateTime.now();
-
+    private ItemDto enrichItemDto(ItemDto dto, LocalDateTime now) {
         Booking last = bookingRepository
                 .findFirstByItemIdAndStartBeforeAndStatusNotOrderByStartDesc(
                         dto.getId(), now, BookingStatus.REJECTED);
@@ -163,17 +153,10 @@ public class ItemServiceImpl implements ItemService {
                         dto.getId(), now, BookingStatus.REJECTED);
 
         if (last != null) {
-            dto.setLastBooking(new ItemDto.BookingShortDto(
-                    last.getId(),
-                    last.getBooker().getId()
-            ));
+            dto.setLastBooking(new ItemDto.BookingShortDto(last.getId(), last.getBooker().getId()));
         }
-
         if (next != null) {
-            dto.setNextBooking(new ItemDto.BookingShortDto(
-                    next.getId(),
-                    next.getBooker().getId()
-            ));
+            dto.setNextBooking(new ItemDto.BookingShortDto(next.getId(), next.getBooker().getId()));
         }
 
         return dto;
