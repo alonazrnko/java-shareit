@@ -16,8 +16,8 @@ public class BookingOutDto {
     private LocalDateTime start;
     private LocalDateTime end;
     private BookingStatus status;
-    private UserDtoShort booker; // Nested short version
-    private ItemDtoShort item;   // Nested short version
+    private UserDtoShort booker;
+    private ItemDtoShort item;
 
     @Data
     @AllArgsConstructor
