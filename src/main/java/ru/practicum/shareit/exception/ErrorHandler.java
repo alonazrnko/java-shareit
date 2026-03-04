@@ -11,8 +11,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final NotFoundException e) {
-        System.out.println("--- LOG: Catching NotFoundException ---");
-        e.printStackTrace(); // ЛОГ ДЛЯ ПРОВЕРКИ
         return new ErrorResponse(e.getMessage());
     }
 
