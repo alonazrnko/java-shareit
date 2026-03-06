@@ -1,20 +1,35 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.user.model.User;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
+@Table(name = "items")
+@Getter
+@Setter
+@ToString
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = false, length = 1000)
     private String description;
-    private Boolean available; // Status provided by the owner
+
+    @Column(name = "is_available", nullable = false)
+    private Boolean available;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    @ToString.Exclude
     private User owner;
-    private Long requestId;    // If the item was created by request
+
+    @Column(name = "request_id")
+    private Long requestId;
 }
