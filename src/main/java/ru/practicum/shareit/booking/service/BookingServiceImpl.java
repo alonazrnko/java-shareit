@@ -14,7 +14,7 @@ import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
