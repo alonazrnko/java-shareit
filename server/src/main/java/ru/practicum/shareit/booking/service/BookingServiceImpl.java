@@ -109,7 +109,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingOutDto> getAllByOwner(Long userId, String stateStr, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-        if (itemRepository.findByOwnerId(userId).isEmpty()) {
+        if (!itemRepository.existsByOwnerId(userId)) {
             throw new BadRequestException("User has no items");
         }
         BookingState state = parseState(stateStr);

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader(USER_ID_HEADER) Long userId,
-                          @Valid @RequestBody ItemDto itemDto) {
+                          @RequestBody ItemDto itemDto) {
         log.info("Creating item for user with id: {}", userId);
         return itemService.create(userId, itemDto);
     }
@@ -42,21 +41,25 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwner(@RequestHeader(USER_ID_HEADER) Long userId) {
-        log.info("Getting all items for user with id: {}", userId);
-        return itemService.getItemsByOwner(userId);
+    public List<ItemDto> getItemsByOwner(@RequestHeader(USER_ID_HEADER) Long userId,
+                                         @RequestParam(defaultValue = "0") Integer from,
+                                         @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Getting all items for user with id: {}, from: {}, size: {}", userId, from, size);
+        return itemService.getItemsByOwner(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        log.info("Searching for items with text: {}", text);
-        return itemService.search(text);
+    public List<ItemDto> search(@RequestParam String text,
+                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Searching for items with text: {}, from: {}, size: {}", text, from, size);
+        return itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader(USER_ID_HEADER) Long userId,
                                  @PathVariable Long itemId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+                                 @RequestBody CommentDto commentDto) {
         log.info("Adding comment to item with id: {} by user with id: {}", itemId, userId);
         return itemService.addComment(userId, itemId, commentDto);
     }

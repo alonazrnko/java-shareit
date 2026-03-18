@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -96,10 +98,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByOwner(Long userId) {
+    public List<ItemDto> getItemsByOwner(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
-        List<Item> items = itemRepository.findByOwnerId(userId);
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        List<Item> items = itemRepository.findByOwnerId(userId, pageable);
         List<Long> itemIds = items.stream().map(Item::getId).toList();
         LocalDateTime now = LocalDateTime.now();
 
@@ -117,11 +121,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.search(text).stream()
+
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        return itemRepository.search(text, pageable).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
