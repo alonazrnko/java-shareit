@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +54,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestResponseDto> getAllRequests(Long userId) {
+    public List<ItemRequestResponseDto> getAllRequests(Long userId, Integer from, Integer size) {
         checkUserExists(userId);
-        List<ItemRequest> requests = requestRepository.findAllByRequestorIdNot(
-                userId, Sort.by(Sort.Direction.DESC, "created")
-        );
+
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
+
+        List<ItemRequest> requests = requestRepository.findAllByRequestorIdNot(userId, pageable);
         return enrichRequestsWithItems(requests);
     }
 
