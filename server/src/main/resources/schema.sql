@@ -48,5 +48,3 @@ CREATE TABLE IF NOT EXISTS requests (
     CONSTRAINT pk_request PRIMARY KEY (id),
     CONSTRAINT fk_request_requestor FOREIGN KEY (requestor_id) REFERENCES users(id)
 );
-
-ALTER TABLE items ADD CONSTRAINT fk_items_to_requests FOREIGN KEY (request_id) REFERENCES requests(id);
