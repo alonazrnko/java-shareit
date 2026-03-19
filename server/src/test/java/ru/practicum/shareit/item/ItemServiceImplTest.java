@@ -160,4 +160,5 @@ class ItemServiceImplTest {
         assertNotNull(result);
         assertEquals("Drill", result.getName());
         verify(itemMapper).toItemDto(any(Item.class));
-    }}
+    }
+}
