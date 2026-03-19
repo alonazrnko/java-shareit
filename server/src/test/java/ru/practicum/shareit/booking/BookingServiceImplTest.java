@@ -96,4 +96,32 @@ class BookingServiceImplTest {
 
         verify(bookingRepository, never()).save(any(Booking.class));
     }
+
+    @Test
+    void approveBooking_WhenUserIsNotOwner_ShouldThrowNotFoundException() {
+        ru.practicum.shareit.booking.model.Booking existingBooking = new ru.practicum.shareit.booking.model.Booking();
+        existingBooking.setId(1L);
+        existingBooking.setItem(item);
+        existingBooking.setStatus(ru.practicum.shareit.booking.model.BookingStatus.WAITING);
+
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(existingBooking));
+
+        assertThrows(BadRequestException.class, () -> bookingService.approve(1L, 1L, true));
+
+        verify(bookingRepository, never()).save(any());
+    }
+
+    @Test
+    void approveBooking_WhenStatusAlreadyApproved_ShouldThrowValidationException() {
+        ru.practicum.shareit.booking.model.Booking existingBooking = new ru.practicum.shareit.booking.model.Booking();
+        existingBooking.setId(1L);
+        existingBooking.setItem(item); // Владелец ID = 2
+        existingBooking.setStatus(ru.practicum.shareit.booking.model.BookingStatus.APPROVED);
+
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(existingBooking));
+
+        assertThrows(BadRequestException.class, () -> bookingService.approve(2L, 1L, true));
+
+        verify(bookingRepository, never()).save(any());
+    }
 }

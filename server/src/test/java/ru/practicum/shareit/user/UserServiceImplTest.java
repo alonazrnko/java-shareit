@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,6 +76,51 @@ class UserServiceImplTest {
 
     @Test
     void deleteUser_ShouldInvokeRepositoryDelete() {
+        userService.delete(1L);
+
+        verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void update_WhenOnlyNameChanged_ShouldUpdateNameOnly() {
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setName("Old");
+        existingUser.setEmail("old@mail.com");
+
+        ru.practicum.shareit.user.dto.UserDto patchDto = new ru.practicum.shareit.user.dto.UserDto();
+        patchDto.setName("New");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ru.practicum.shareit.user.dto.UserDto resultDto = new ru.practicum.shareit.user.dto.UserDto();
+        resultDto.setId(1L);
+        resultDto.setName("New");
+        resultDto.setEmail("old@mail.com");
+        when(userMapper.toUserDto(any(User.class))).thenReturn(resultDto);
+
+        ru.practicum.shareit.user.dto.UserDto result = userService.update(1L, patchDto);
+
+        assertEquals("New", result.getName());
+        assertEquals("old@mail.com", result.getEmail());
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void getAll_ShouldReturnListOfUsers() {
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toUserDto(any(User.class))).thenReturn(new ru.practicum.shareit.user.dto.UserDto());
+
+        List<ru.practicum.shareit.user.dto.UserDto> result = userService.getAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void delete_ShouldInvokeRepositoryDelete() {
         userService.delete(1L);
 
         verify(userRepository, times(1)).deleteById(1L);
