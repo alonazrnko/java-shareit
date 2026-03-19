@@ -61,7 +61,7 @@ class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
-        
+
         verify(bookingClient, never()).bookItem(anyLong(), any(BookingPostDto.class));
     }
 }
